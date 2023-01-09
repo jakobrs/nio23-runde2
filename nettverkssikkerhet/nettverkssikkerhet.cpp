@@ -78,7 +78,6 @@ int main() {
   skip:;
   }
 
-  std::vector<bool> visited_here(n, false);
   int best = 0;
   for (int set = 0; set < 1 << k; set++) {
 #define TEST(i) (set & (1 << (i)))
@@ -99,7 +98,6 @@ int main() {
 
     // Behold, the maze
     for (const auto &extra : extras) {
-      int a = total;
       if (extra.to == -1) {
         if (TEST(extra.from)) {
           total += extra.extra_count / 2;
