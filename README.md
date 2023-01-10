@@ -7,4 +7,4 @@ Bananbonanza | 100
 Personlighetstyper | 10
 Nettverkssikkerhet | 100
 Godkjent | 35
-Totalt | 345
+**Totalt** | 345
