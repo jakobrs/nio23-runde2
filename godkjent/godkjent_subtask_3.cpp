@@ -8,8 +8,7 @@ struct Node {
   int lower;
   int upper;
 
-  Node()
-      : superordinate(0), subordinates(), lower(0), upper(0) {}
+  Node() : superordinate(0), subordinates(), lower(0), upper(0) {}
 };
 
 struct SegTree {
@@ -20,14 +19,14 @@ struct SegTree {
 
   void update(int left, int right) { update_internal(left, right, 1, 0, n); }
 
-  std::vector<int> serialize() {
+  std::vector<int> serialise() {
     std::vector<int> result;
     result.reserve(n);
     serialise_internal(result, 1, 0);
     return std::move(result);
   }
 
-private:
+ private:
   void update_internal(int left, int right, int v, int start, int end) {
     if (left <= start && end <= right) {
       values[v] += 1;
@@ -49,18 +48,7 @@ private:
       serialise_internal(out, 2 * v + 1, extra);
     }
   }
-
-  int count_internal(int v, bool invert) {
-    bool here = invert ^ values[v];
-    if (v >= n) {
-      return here;
-    } else {
-      return count_internal(2 * v, here) +
-             count_internal(2 * v + 1, here);
-    }
-  }
 };
-
 
 void annotate_rank(std::vector<Node> &nodes, int node_idx, int &rank) {
   Node &node = nodes[node_idx];
@@ -179,7 +167,7 @@ int main() {
     }
   }
 
-  std::vector<int> result = st.serialize();
+  std::vector<int> result = st.serialise();
 
   for (int i = 0; i < n; i++) {
     std::cout << result[nodes[i].upper - 1] << ' ';
