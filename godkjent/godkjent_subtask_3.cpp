@@ -138,7 +138,7 @@ int main() {
 
     In the end we simply read off the segtree and reorder the values.
 
-    Complexity: O(K H log N)
+    Complexity: O(K H log N + N)
     - Might be fine?
 
     Special cases:
