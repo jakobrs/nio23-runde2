@@ -6,5 +6,5 @@ Lynnedslag | 100
 Bananbonanza | 100
 Personlighetstyper | 10
 Nettverkssikkerhet | 100
-Godkjent | 35
-**Totalt** | 345
+Godkjent | 65
+**Totalt** | 375
