@@ -96,30 +96,11 @@ int main() {
     int total;
     total = __builtin_popcount(set);
 
-    // Behold, the maze
     for (const auto &extra : extras) {
       if (extra.to == -1) {
-        if (TEST(extra.from)) {
-          total += extra.extra_count / 2;
-        } else {
-          total += (extra.extra_count + 1) / 2;
-        }
+        total += (extra.extra_count + 1 - (bool)TEST(extra.from)) / 2;
       } else {
-        if (TEST(extra.from) && TEST(extra.to)) {
-          if (extra.extra_count <= 0) {
-            total += 0;
-          } else {
-            total += (extra.extra_count - 2 + 1) / 2;
-          }
-        } else if (TEST(extra.from) || TEST(extra.to)) {
-          if (extra.extra_count <= 1) {
-            total += 0;
-          } else {
-            total += (extra.extra_count - 1 + 1) / 2;
-          }
-        } else {
-          total += (extra.extra_count + 1) / 2;
-        }
+        total += (extra.extra_count + 1 - (bool)TEST(extra.from) - (bool)TEST(extra.to)) / 2;
       }
     }
 
