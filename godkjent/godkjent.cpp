@@ -89,8 +89,6 @@ void annotate_rank(std::vector<Node> &nodes) {
                                       node.subordinates.end()));
     }
   }
-
-  nodes[0].upper = ++rank;
 }
 
 int find_ancestor(const std::vector<Node> &nodes, int node_idx, int g) {
