@@ -4,7 +4,7 @@ Oppgave | Poeng | Notes
 ------- | ----- | -----
 Lynnedslag | 100
 Bananbonanza | 100
-Personlighetstyper | 10
+Personlighetstyper | 42
 Nettverkssikkerhet | 100
 Godkjent | 100
-**Totalt** | 410
+**Totalt** | 442
