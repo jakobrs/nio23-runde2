@@ -1,19 +1,25 @@
 #include <iostream>
-#include <vector>
-#include <utility>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 struct Node {
   int superordinate;
   std::vector<int> subordinates;
 
-  // skip list-inspired optimisation
-  std::vector<int> superordinates;
+  int jump;
+  int dist;
 
   int lower;
   int upper;
 
-  Node() : superordinate(0), subordinates(), lower(0), upper(0) {}
+  Node()
+      : superordinate(-1),
+        subordinates(),
+        jump(-1),
+        dist(-1),
+        lower(0),
+        upper(0) {}
 };
 
 struct SegTree {
@@ -58,9 +64,12 @@ struct SegTree {
 void annotate_rank(std::vector<Node> &nodes) {
   int rank = 0;
 
-  std::vector<std::tuple<int, std::vector<int>::iterator, std::vector<int>::iterator>> stack;
+  std::vector<
+      std::tuple<int, std::vector<int>::iterator, std::vector<int>::iterator>>
+      stack;
   nodes[0].lower = rank;
-  stack.push_back(std::make_tuple(0, nodes[0].subordinates.begin(), nodes[0].subordinates.end()));
+  stack.push_back(std::make_tuple(0, nodes[0].subordinates.begin(),
+                                  nodes[0].subordinates.end()));
 
   while (!stack.empty()) {
     auto &top = stack.back();
@@ -76,7 +85,8 @@ void annotate_rank(std::vector<Node> &nodes) {
       Node &node = nodes[next];
       node.lower = rank;
 
-      stack.push_back(std::make_tuple(next, node.subordinates.begin(), node.subordinates.end()));
+      stack.push_back(std::make_tuple(next, node.subordinates.begin(),
+                                      node.subordinates.end()));
     }
   }
 
@@ -90,45 +100,54 @@ int find_ancestor(const std::vector<Node> &nodes, int node_idx, int g) {
 
   if (parent.upper - parent.lower > g) {
     return node_idx;
-  } else {
-    int superordinate_count = node.superordinates.size();
-    for (int i = 0; i < node.superordinates.size(); i++) {
-      int skipped_to_idx = node.superordinates[superordinate_count - i - 1];
-      const Node &skipped_to = nodes[skipped_to_idx];
-      if (skipped_to.upper - skipped_to.lower <= g) {
-        return find_ancestor(nodes, skipped_to_idx, g);
-      }
-    }
-    return find_ancestor(nodes, parent_idx, g);
   }
+
+  if (node.dist >= 0) {
+    const Node &jumped_to = nodes[node.jump];
+
+    if (jumped_to.upper - jumped_to.lower <= g) {
+      return find_ancestor(nodes, node.jump, g);
+    }
+  }
+  return find_ancestor(nodes, parent_idx, g);
 }
 
 void add_jump_links(std::vector<Node> &nodes) {
-  // 2^18 > 200 000
-  for (int i = 1; i < 18; i++) {
-    int step = 1 << i;
-    std::vector<std::tuple<int, int, int>> stack;
-    stack.push_back(std::make_tuple(0, 0, 0));
+  std::vector<int> stack;
+  stack.push_back(0);
 
-    while (!stack.empty()) {
-      auto top = stack.back();
-      stack.pop_back();
-      int from = std::get<0>(top);
-      int node_idx = std::get<1>(top);
-      int cur = std::get<2>(top);
+  int max = 0;
 
-      Node &node = nodes[node_idx];
+  while (!stack.empty()) {
+    int node_idx = stack.back();
+    stack.pop_back();
 
-      if (cur == step) {
-        node.superordinates.push_back(from);
-        for (auto child : node.subordinates) {
-          stack.push_back(std::make_tuple(node_idx, child, 1));
-        }
-      } else {
-        for (auto child : node.subordinates) {
-          stack.push_back(std::make_tuple(from, child, cur + 1));
+    Node &node = nodes[node_idx];
+
+    // add the link
+    if (node.superordinate != -1) {
+      Node &superordinate = nodes[node.superordinate];
+
+      if (superordinate.jump != -1) {
+        Node &middle = nodes[superordinate.jump];
+
+        if (superordinate.dist == middle.dist) {
+          node.jump = middle.jump;
+          node.dist = middle.dist * 2 + 1;
+
+          max = std::max(max, node.dist);
+
+          goto a;
         }
       }
+
+      node.jump = node.superordinate;
+      node.dist = 1;
+    a:;
+    }
+
+    for (auto child : node.subordinates) {
+      stack.push_back(child);
     }
   }
 }
@@ -158,10 +177,9 @@ int main() {
   //   const Node &node = nodes[i];
   //   std::cout << i << ":\n";
   //   std::cout << "  superordinate: " << node.superordinate << "\n";
-  //   std::cout << "  jumps:\n";
-  //   for (int ancestor : node.superordinates) {
-  //     std::cout << "  - " << ancestor << "\n";
-  //   }
+  //   std::cout << "  jump:\n";
+  //   std::cout << "    to: " << node.jump << "\n";
+  //   std::cout << "    length: " << node.dist << "\n";
   //   std::cout << "  subordinates:\n";
   //   for (int child : node.subordinates) {
   //     std::cout << "  - " << child << "\n";
@@ -192,7 +210,7 @@ int main() {
 
     In the end we simply read off the segtree and reorder the values.
 
-    Complexity: O(K log H log N + N log N)
+    Complexity: O(K log H log N + N)
     - Might be fine?
 
     Special cases:
