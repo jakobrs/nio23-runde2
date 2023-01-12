@@ -114,19 +114,6 @@ int main() {
     }
   }
 
-  // int64_t counts[n + 1][26];
-  // for (int j = 0; j < 26; j++) {
-  //   counts[0][j] = 0;
-  // }
-
-  // for (int i = 0; i < n; i++) {
-  //   char ch = name[i];
-  //   for (int j = 0; j < 26; j++) {
-  //     counts[i + 1][j] = counts[i][j];
-  //   }
-  //   counts[i + 1][ch - 'A'] += 1;
-  // }
-
   /*
 
     Strategy:
@@ -136,10 +123,12 @@ int main() {
       for hver posisjon i in 0..=n:
         La l og r være henholdsvis laveste og høyeste indeks slik at [l, r) kan ledes av person i (O(1))
 
-        La x være den minste mengden avdelinger som trenges for å "nå" [l, r) (dvs. min(dp[k] for k in l..i)) (log n)
-        Utfør setmax over [i + 1, r) med verdien x + 1
+        La x være den minste mengden avdelinger som trenges for å "nå" [l, r) (dvs. min(dp[k] for k in l..i)) (O(log n))
+        Utfør setmax over [i + 1, r) med verdien x + 1 (O(log n))
 
       Skriv ut dp[n]
+
+      Fullstendig tidskomplksitet: O(n log n)
   */
 
   int rounded_n = 1;
