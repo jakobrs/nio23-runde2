@@ -89,8 +89,9 @@ int main() {
   }
 
   // last[ch][i] = index of last `ch` in range 0..i, + 1
-  int last[26][n + 1];
+  std::vector<int> last[26];
   for (int ch = 0; ch < 26; ch++) {
+    last[ch] = std::vector<int>(n + 1, 0);
     last[ch][0] = 0;
     for (int i = 1; i <= n; i++) {
       if (name[i - 1] - 'A' == ch) {
@@ -102,8 +103,9 @@ int main() {
   }
 
   // first[ch][i] = index of first `ch` in range i..n
-  int first[26][n + 1];
+  std::vector<int> first[26];
   for (int ch = 0; ch < 26; ch++) {
+    first[ch] = std::vector<int>(n + 1, 0);
     first[ch][n] = n;
     for (int i = n - 1; i >= 0; i--) {
       if (name[i] - 'A' == ch) {
