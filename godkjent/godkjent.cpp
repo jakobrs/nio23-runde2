@@ -22,45 +22,6 @@ struct Node {
         upper(0) {}
 };
 
-struct SegTree {
-  std::vector<int> values;
-  int n;
-
-  SegTree(int n) : values(2 * n, 0), n(n) {}
-
-  void update(int left, int right) { update_internal(left, right, 1, 0, n); }
-
-  std::vector<int> serialise() {
-    std::vector<int> result;
-    result.reserve(n);
-    serialise_internal(result, 1, 0);
-    return std::move(result);
-  }
-
- private:
-  void update_internal(int left, int right, int v, int start, int end) {
-    if (left <= start && end <= right) {
-      values[v] += 1;
-    } else if (end <= left || right <= start) {
-      return;
-    } else {
-      int mid = (start + end) / 2;
-      update_internal(left, right, 2 * v, start, mid);
-      update_internal(left, right, 2 * v + 1, mid, end);
-    }
-  }
-
-  void serialise_internal(std::vector<int> &out, int v, int extra) {
-    extra += values[v];
-    if (v >= n) {
-      out.push_back(extra);
-    } else {
-      serialise_internal(out, 2 * v, extra);
-      serialise_internal(out, 2 * v + 1, extra);
-    }
-  }
-};
-
 void annotate_rank(std::vector<Node> &nodes) {
   int rank = 0;
 
@@ -196,19 +157,19 @@ int main() {
 
     For each order,
       Find the parent of the highest-ranking direct supervisor who will approve the work (O(log H))
-      Let A = Last supervisor needed, Al and Ar be the endpoints of A's range in the segtree ([Al, Ar)),
+      Let A = Last supervisor needed, Al and Ar be the endpoints of A's range ([Al, Ar)),
           P = supervisor of A, Pl and Pr defined likewise, and
           G = number of approvals needed (O(1))
 
       We know that G > Ar - Al, so let G' = G - (Ar - Al). IF Al - Pl >= G', we do two updates in the segtree:
-      1. update(Al, Ar, +1)       (O(log N))
-      2. update(Pl, Pl + G', +1)  (O(log N))
+      1. update(Al, Ar, +1)       (O(1))
+      2. update(Pl, Pl + G', +1)  (O(1))
       Otherwise we only need one:
-      1. update(Al, Pl + G, +1)   (O(log N))
+      1. update(Al, Pl + G, +1)   (O(1))
 
     In the end we simply read off the segtree and reorder the values.
 
-    Complexity: O(K log H log N + N)
+    Complexity: O(K log H + N)
     - Might be fine?
 
     Special cases:
@@ -216,11 +177,7 @@ int main() {
       - Just add a special case for this specific case
   */
 
-  int rounded_n = 1;
-  while (rounded_n < n) {
-    rounded_n *= 2;
-  }
-  SegTree st(rounded_n);
+  std::vector<int> diffs(n + 1);
 
   for (int i = 0; i < m; i++) {
     int w, g;
@@ -228,7 +185,7 @@ int main() {
 
     if (g == n) {
       // Special case where A doesn't have a parent
-      st.update(0, rounded_n);
+      diffs[0] += 1;
     } else {
       int ancestor_idx = find_ancestor(nodes, w, g);
       // find_ancestor returns a node A st.
@@ -241,15 +198,23 @@ int main() {
 
       int g1 = g - (ancestor.upper - ancestor.lower);
       if (ancestor.lower - parent.lower >= g1) {
-        st.update(ancestor.lower, ancestor.upper);
-        st.update(parent.lower, parent.lower + g1);
+        diffs[ancestor.lower] += 1;
+        diffs[ancestor.upper] -= 1;
+        diffs[parent.lower] += 1;
+        diffs[parent.lower + g1] -= 1;
       } else {
-        st.update(parent.lower, parent.lower + g);
+        diffs[parent.lower] += 1;
+        diffs[parent.lower + g] -= 1;
       }
     }
   }
 
-  std::vector<int> result = st.serialise();
+  std::vector<int> result;
+  result.reserve(n);
+  int prev = 0;
+  for (int i = 0; i < n; i++) {
+    result.push_back(prev += diffs[i]);
+  }
 
   for (int i = 0; i < n; i++) {
     std::cout << result[nodes[i].upper - 1] << ' ';
