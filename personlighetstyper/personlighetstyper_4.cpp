@@ -86,7 +86,7 @@ int main() {
       }
     }
 
-    intervals.push_back(Interval { .from = left_bound, .to = right_bound });
+    intervals.push_back(Interval{.from = left_bound, .to = right_bound});
   }
 
   // Constructs a "directed interval graph"
