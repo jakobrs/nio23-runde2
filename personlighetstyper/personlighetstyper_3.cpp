@@ -4,15 +4,15 @@
 #define INFINITY 1000000
 
 struct SegTree {
-  std::vector<int> down;
-  std::vector<int> up;
-  int offset;
+  std::vector<int64_t> down;
+  std::vector<int64_t> up;
+  int64_t offset;
 
-  SegTree(int size)
+  SegTree(int64_t size)
       : offset(size), down(2 * size, INFINITY), up(2 * size + 1, INFINITY) {}
 
-  void push(int index) {
-    int cap = down[index];
+  void push(int64_t index) {
+    int64_t cap = down[index];
     down[index] = INFINITY;
 
     up[2 * index] = std::min(up[2 * index], cap);
@@ -21,20 +21,21 @@ struct SegTree {
     down[2 * index + 1] = std::min(down[2 * index + 1], cap);
   }
 
-  void pull(int index) {
+  void pull(int64_t index) {
     up[index] = std::min(up[2 * index], up[2 * index + 1]);
   }
 
-  void update(int left, int right, int cap) {
+  void update(int64_t left, int64_t right, int64_t cap) {
     update_internal(left, right, cap, 1, 0, offset);
   }
 
-  int query(int left, int right) {
+  int query(int64_t left, int64_t right) {
     return query_internal(left, right, 1, 0, offset);
   }
 
  private:
-  void update_internal(int left, int right, int cap, int v, int from, int to) {
+  void update_internal(int64_t left, int64_t right, int64_t cap, int64_t v,
+                       int64_t from, int64_t to) {
     if (left <= from && to <= right) {
       down[v] = std::min(down[v], cap);
       up[v] = std::min(up[v], cap);
@@ -49,7 +50,8 @@ struct SegTree {
     }
   }
 
-  int query_internal(int left, int right, int v, int from, int to) {
+  int query_internal(int64_t left, int64_t right, int64_t v, int64_t from,
+                     int64_t to) {
     if (left <= from && to <= right) {
       return up[v];
     } else if (to <= left || right <= from) {
@@ -67,7 +69,7 @@ int main() {
   std::cin.tie(nullptr);
   std::ios_base::sync_with_stdio(false);
 
-  int n, m;
+  int64_t n, m;
   std::cin >> n >> m;
 
   std::string name;
@@ -82,18 +84,21 @@ int main() {
     cantlead[i] = 0;
   }
 
-  for (int i = 0; i < m; i++) {
+  for (int64_t i = 0; i < m; i++) {
     char a, b;
     std::cin >> a >> b;
+    if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
+      return -1;
+    }
     cantlead[a - 'A'] |= 1 << (b - 'A');
   }
 
   // last[ch][i] = index of last `ch` in range 0..i, + 1
-  std::vector<int> last[26];
+  std::vector<int64_t> last[26];
   for (int ch = 0; ch < 26; ch++) {
-    last[ch] = std::vector<int>(n + 1, 0);
+    last[ch] = std::vector<int64_t>(n + 1, 0);
     last[ch][0] = 0;
-    for (int i = 1; i <= n; i++) {
+    for (int64_t i = 1; i <= n; i++) {
       if (name[i - 1] - 'A' == ch) {
         last[ch][i] = i;
       } else {
@@ -103,11 +108,11 @@ int main() {
   }
 
   // first[ch][i] = index of first `ch` in range i..n
-  std::vector<int> first[26];
+  std::vector<int64_t> first[26];
   for (int ch = 0; ch < 26; ch++) {
-    first[ch] = std::vector<int>(n + 1, 0);
+    first[ch] = std::vector<int64_t>(n + 1, 0);
     first[ch][n] = n;
-    for (int i = n - 1; i >= 0; i--) {
+    for (int64_t i = n - 1; i >= 0; i--) {
       if (name[i] - 'A' == ch) {
         first[ch][i] = i;
       } else {
@@ -133,23 +138,27 @@ int main() {
       Fullstendig tidskomplksitet: O(n log n)
   */
 
-  int rounded_n = 1;
+  int64_t rounded_n = 1;
   while (rounded_n < n + 1) {
     rounded_n *= 2;
   }
   SegTree dp(rounded_n);
   dp.update(0, 1, 0);
 
-  for (int i = 0; i < n; i++) {
+  for (int64_t i = 0; i < n; i++) {
+    if (!('A' <= name[i] && name[i] <= 'Z')) {
+      return -1;
+    }
+
     int here = name[i] - 'A';
 
-    int left_bound = 0;
+    int64_t left_bound = 0;
     for (int ch = 0; ch < 26; ch++) {
       if (cantlead[here] & (1 << ch)) {
         left_bound = std::max(left_bound, last[ch][i]);
       }
     }
-    int right_bound = n;
+    int64_t right_bound = n;
     for (int ch = 0; ch < 26; ch++) {
       if (cantlead[here] & (1 << ch)) {
         right_bound = std::min(right_bound, first[ch][i]);
@@ -157,10 +166,15 @@ int main() {
     }
     // std::cout << left_bound << ".." << right_bound << '\n';
 
-    int min_to_this_segment = dp.query(left_bound, i + 1);
+    int64_t min_to_this_segment = dp.query(left_bound, i + 1);
     // std::cout << "min to here: " << min_to_this_segment << "\n";
     dp.update(i + 1, right_bound + 1, min_to_this_segment + 1);
   }
 
+  // for (int64_t i = 0; i <= n; i++) {
+  //   std::cout << dp.query(i, i + 1) << ' ';
+  // }
+
+  // std::cout << '\n';
   std::cout << dp.query(n, n + 1);
 }
