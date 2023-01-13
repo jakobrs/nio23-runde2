@@ -131,7 +131,7 @@ int main() {
         La l og r være henholdsvis laveste og høyeste indeks slik at [l, r) kan ledes av person i (O(1))
 
         La x være den minste mengden avdelinger som trenges for å "nå" [l, r) (dvs. min(dp[k] for k in l..i)) (O(log n))
-        Utfør setmax over [i + 1, r) med verdien x + 1 (O(log n))
+        Utfør setmax over [i + 1, r] med verdien x + 1 (O(log n))
 
       Skriv ut dp[n]
 
