@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <map>
+#include <set>
 
-#define INFINITY 1000000
+#define INFINITY 100000000ll
 
 struct SegTree {
   std::vector<int64_t> down;
@@ -79,44 +81,48 @@ int main() {
     return -1;
   }
 
-  int32_t cantlead[26];
-  for (int i = 0; i < 26; i++) {
-    cantlead[i] = 0;
-  }
+  // int32_t cantlead[26];
+  // for (int i = 0; i < 26; i++) {
+  //   cantlead[i] = 0;
+  // }
+  std::map<char, std::set<char>> cantlead;
 
   for (int64_t i = 0; i < m; i++) {
     char a, b;
     std::cin >> a >> b;
-    if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
-      return -1;
-    }
-    cantlead[a - 'A'] |= 1 << (b - 'A');
+    // if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
+    //   return -1;
+    // }
+    // cantlead[a - 'A'] |= 1 << (int32_t)(b - 'A');
+    cantlead[a].insert(b);
   }
 
   // last[ch][i] = index of last `ch` in range 0..i, + 1
-  std::vector<int64_t> last[26];
-  for (int ch = 0; ch < 26; ch++) {
+  std::map<char, std::vector<int64_t>> last;
+  for (char ch = 'A'; ch <= 'Z'; ch++) {
     last[ch] = std::vector<int64_t>(n + 1, 0);
-    last[ch][0] = 0;
+    auto &vec = last[ch];
+    vec[0] = 0;
     for (int64_t i = 1; i <= n; i++) {
-      if (name[i - 1] - 'A' == ch) {
-        last[ch][i] = i;
+      if (name[i - 1] == ch) {
+        vec[i] = i;
       } else {
-        last[ch][i] = last[ch][i - 1];
+        vec[i] = vec[i - 1];
       }
     }
   }
 
   // first[ch][i] = index of first `ch` in range i..n
-  std::vector<int64_t> first[26];
-  for (int ch = 0; ch < 26; ch++) {
-    first[ch] = std::vector<int64_t>(n + 1, 0);
-    first[ch][n] = n;
+  std::map<char, std::vector<int64_t>> first;
+  for (char ch = 'A'; ch <= 'Z'; ch++) {
+    first[ch] = std::vector<int64_t>(n + 1, n);
+    auto &vec = first[ch];
+    vec[n] = n;
     for (int64_t i = n - 1; i >= 0; i--) {
-      if (name[i] - 'A' == ch) {
-        first[ch][i] = i;
+      if (name[i] == ch) {
+        vec[i] = i;
       } else {
-        first[ch][i] = first[ch][i + 1];
+        vec[i] = vec[i + 1];
       }
     }
   }
@@ -150,19 +156,13 @@ int main() {
       return -1;
     }
 
-    int here = name[i] - 'A';
+    char here = name[i];
 
     int64_t left_bound = 0;
-    for (int ch = 0; ch < 26; ch++) {
-      if (cantlead[here] & (1 << ch)) {
-        left_bound = std::max(left_bound, last[ch][i]);
-      }
-    }
     int64_t right_bound = n;
-    for (int ch = 0; ch < 26; ch++) {
-      if (cantlead[here] & (1 << ch)) {
-        right_bound = std::min(right_bound, first[ch][i]);
-      }
+    for (char ch : cantlead[here]) {
+      left_bound = std::max(left_bound, last[ch][i]);
+      right_bound = std::min(right_bound, first[ch][i]);
     }
     // std::cout << left_bound << ".." << right_bound << '\n';
 
