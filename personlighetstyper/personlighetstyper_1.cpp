@@ -14,7 +14,9 @@ int main() {
   std::cin >> std::ws;
   std::getline(std::cin, name);
 
-  n = name.size();
+  if (n != name.size()) {
+    return -1;
+  }
 
   int32_t forbidden[26];
   for (int i = 0; i < 26; i++) {
@@ -22,6 +24,7 @@ int main() {
   }
 
   std::string aaa;
+  int actual_m = 0;
   while (std::getline(std::cin, aaa)) {
     if (aaa.size() == 0) continue;
 
@@ -33,6 +36,10 @@ int main() {
     }
 
     forbidden[b - 'A'] |= 1 << (a - 'A');
+    actual_m += 1;
+  }
+  if (m != actual_m) {
+    return -1;
   }
 
   std::vector<int64_t> dp(n + 1, 1000000000ll);
