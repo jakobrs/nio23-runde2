@@ -35,7 +35,7 @@ int main() {
       return -1;
     }
 
-    forbidden[b - 'A'] |= 1 << (a - 'A');
+    forbidden[b - 'A'] |= 1 << (int32_t)(a - 'A');
     actual_m += 1;
   }
   if (m != actual_m) {
@@ -51,7 +51,12 @@ int main() {
     int32_t here = 0;
     int32_t incompatible = 0;
     for (int j = i + 1; j <= n; j++) {
-      here |= 1 << (name[j - 1] - 'A');
+      char ch = name[j - 1];
+      if (!('A' <= ch && ch <= 'Z')) {
+        return -1;
+      }
+
+      here |= 1 << (int32_t)(name[j - 1] - 'A');
       incompatible |= forbidden[name[j - 1] - 'A'];
 
       if (~incompatible & here) {
