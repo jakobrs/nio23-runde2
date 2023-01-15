@@ -90,7 +90,7 @@ int main() {
     if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
       return -1;
     }
-    cantlead[a - 'A'] |= 1 << (b - 'A');
+    cantlead[a - 'A'] |= 1 << (int32_t)(b - 'A');
   }
 
   // last[ch][i] = index of last `ch` in range 0..i, + 1
