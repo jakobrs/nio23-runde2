@@ -1,10 +1,10 @@
 # NIO23 Runde 2 løsninger
 
-Oppgave | Poeng | Notes
-------- | ----- | -----
+Oppgave | Poeng
+------- | -----
 Lynnedslag | 100
 Bananbonanza | 100
-Personlighetstyper | 42 | æææ
+Personlighetstyper | 100
 Nettverkssikkerhet | 100
 Godkjent | 100
-**Totalt** | 442
+**Totalt** | **500**
