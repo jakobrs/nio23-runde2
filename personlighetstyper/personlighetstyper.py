@@ -61,15 +61,15 @@ class SegTree:
         return query_internal(1, 0, self.offset)
 
 
-n, m = map(int, input().strip().split(' '))
+n, m = map(int, input().split())
 
-name = input().strip()
+name = input()
 
 cantlead = [0] * 26
 
 a_ord = ord('A')
 for _ in range(m):
-    a, b = input().strip().split(' ')
+    a, b = input().split()
     cantlead[ord(a) - a_ord] |= 1 << (ord(b) - a_ord)
 
 last = [[0] * (n + 1) for _ in range(26)]

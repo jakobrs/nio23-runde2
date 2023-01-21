@@ -75,10 +75,6 @@ int main() {
   std::string name;
   std::cin >> name;
 
-  if (name.size() != n) {
-    return -1;
-  }
-
   int32_t cantlead[26];
   for (int i = 0; i < 26; i++) {
     cantlead[i] = 0;
@@ -87,9 +83,7 @@ int main() {
   for (int64_t i = 0; i < m; i++) {
     char a, b;
     std::cin >> a >> b;
-    if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
-      return -1;
-    }
+
     cantlead[a - 'A'] |= 1 << (int32_t)(b - 'A');
   }
 
@@ -98,6 +92,7 @@ int main() {
   for (int ch = 0; ch < 26; ch++) {
     last[ch] = std::vector<int64_t>(n + 1, 0);
     last[ch][0] = 0;
+
     for (int64_t i = 1; i <= n; i++) {
       if (name[i - 1] - 'A' == ch) {
         last[ch][i] = i;
@@ -112,6 +107,7 @@ int main() {
   for (int ch = 0; ch < 26; ch++) {
     first[ch] = std::vector<int64_t>(n + 1, 0);
     first[ch][n] = n;
+
     for (int64_t i = n - 1; i >= 0; i--) {
       if (name[i] - 'A' == ch) {
         first[ch][i] = i;
@@ -122,7 +118,6 @@ int main() {
   }
 
   /*
-
     Strategy:
       dp[i] = minste nødvendige avdelinger for å dekke de første `i` personene
       dp støtter range query minimum og range set maximum i log n tid
@@ -146,10 +141,6 @@ int main() {
   dp.update(0, 1, 0);
 
   for (int64_t i = 0; i < n; i++) {
-    if (!('A' <= name[i] && name[i] <= 'Z')) {
-      return -1;
-    }
-
     int here = name[i] - 'A';
 
     int64_t left_bound = 0;
@@ -164,17 +155,10 @@ int main() {
         right_bound = std::min(right_bound, first[ch][i]);
       }
     }
-    // std::cout << left_bound << ".." << right_bound << '\n';
 
     int64_t min_to_this_segment = dp.query(left_bound, i + 1);
-    // std::cout << "min to here: " << min_to_this_segment << "\n";
     dp.update(i + 1, right_bound + 1, min_to_this_segment + 1);
   }
 
-  // for (int64_t i = 0; i <= n; i++) {
-  //   std::cout << dp.query(i, i + 1) << ' ';
-  // }
-
-  // std::cout << '\n';
   std::cout << dp.query(n, n + 1);
 }

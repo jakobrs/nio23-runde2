@@ -13,10 +13,6 @@ int main() {
   std::string name;
   std::cin >> name;
 
-  if (name.size() != n) {
-    return -1;
-  }
-
   int32_t cantlead[26];
   for (int i = 0; i < 26; i++) {
     cantlead[i] = 0;
@@ -25,9 +21,7 @@ int main() {
   for (int64_t i = 0; i < m; i++) {
     char a, b;
     std::cin >> a >> b;
-    if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
-      return -1;
-    }
+
     cantlead[a - 'A'] |= 1 << (b - 'A');
   }
 
@@ -36,6 +30,7 @@ int main() {
   for (int ch = 0; ch < 26; ch++) {
     last[ch] = std::vector<int64_t>(n + 1, 0);
     last[ch][0] = 0;
+
     for (int64_t i = 1; i <= n; i++) {
       if (name[i - 1] - 'A' == ch) {
         last[ch][i] = i;
@@ -50,6 +45,7 @@ int main() {
   for (int ch = 0; ch < 26; ch++) {
     first[ch] = std::vector<int64_t>(n + 1, 0);
     first[ch][n] = n;
+
     for (int64_t i = n - 1; i >= 0; i--) {
       if (name[i] - 'A' == ch) {
         first[ch][i] = i;
@@ -120,5 +116,5 @@ int main() {
     }
   }
 
-  std::cout << best << '\n';
+  std::cout << best;
 }

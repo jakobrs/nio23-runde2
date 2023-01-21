@@ -17,11 +17,9 @@ int main() {
   }
 
   int departments = 1;
-  char prev = name[0];
-  for (int i = 1; i < n; i++) {
-    if (name[i] != prev) {
+  for (int i = 0; i + 1 < n; i++) {
+    if (name[i] != name[i + 1]) {
       departments += 1;
-      prev = name[i];
     }
   }
 

@@ -9,37 +9,18 @@ int main() {
   std::cin >> n >> m;
 
   std::string name;
-  // std::cin >> name;
-
-  std::cin >> std::ws;
-  std::getline(std::cin, name);
-
-  if (n != name.size()) {
-    return -1;
-  }
+  std::cin >> name;
 
   int32_t forbidden[26];
   for (int i = 0; i < 26; i++) {
     forbidden[i] = 0;
   }
 
-  std::string aaa;
-  int actual_m = 0;
-  while (std::getline(std::cin, aaa)) {
-    if (aaa.size() == 0) continue;
-
-    char a = aaa[0];
-    char b = aaa[2];
-
-    if (!('A' <= a && a <= 'Z' && 'A' <= b && b <= 'Z')) {
-      return -1;
-    }
-
-    forbidden[b - 'A'] |= 1 << (int32_t)(a - 'A');
-    actual_m += 1;
-  }
-  if (m != actual_m) {
-    return -1;
+  for (int i = 0; i < m; i++) {
+    char a, b;
+    std::cin >> a >> b;
+    
+    forbidden[b - 'A'] |= 1 << (a - 'A');
   }
 
   std::vector<int64_t> dp(n + 1, 1000000000ll);
@@ -52,9 +33,6 @@ int main() {
     int32_t incompatible = 0;
     for (int j = i + 1; j <= n; j++) {
       char ch = name[j - 1];
-      if (!('A' <= ch && ch <= 'Z')) {
-        return -1;
-      }
 
       here |= 1 << (int32_t)(name[j - 1] - 'A');
       incompatible |= forbidden[name[j - 1] - 'A'];
