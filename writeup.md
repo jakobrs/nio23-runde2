@@ -3,7 +3,6 @@
 geometry:
   - a4paper
   - margin=2.5cm
-  - tmargin=3cm
 classoption:
   - 12pt
 lang: nb
